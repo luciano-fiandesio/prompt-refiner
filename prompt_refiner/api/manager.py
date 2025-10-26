@@ -4,9 +4,10 @@ import time
 from textwrap import dedent
 from typing import Optional, Sequence
 
-from agents import AgentBundle, ClarificationAssessment
-from refinement_engine import PromptRefinementEngine
-from session_store import InMemorySessionStore, SessionState
+from prompt_refiner.agents.builder import AgentBundle
+from prompt_refiner.agents.models import ClarificationAssessment
+from prompt_refiner.workflow.engine import PromptRefinementEngine
+from prompt_refiner.api.session import InMemorySessionStore, SessionState
 
 
 logger = logging.getLogger("prompt_manager")

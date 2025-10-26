@@ -9,12 +9,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dependencies using uv package manager
 uv sync
 
+# Install the package in editable mode (required for imports to work)
+uv pip install -e .
+
 # Run the FastAPI backend service
 uv run python run_api.py
 # Service runs on http://localhost:8000
 
 # Run the Streamlit frontend UI
-uv run streamlit run streamlit_app.py
+uv run streamlit run prompt_refiner/ui/app.py
 # UI runs on http://localhost:8501
 ```
 
@@ -38,14 +41,33 @@ uv run python main2.py
 
 ## Architecture Overview
 
+### Package Structure
+
+```
+prompt_refiner/
+├── agents/              # Agent system
+│   ├── models.py        # Pydantic schemas for agent I/O
+│   └── builder.py       # AgentBundle and build_agents()
+├── workflow/            # Core refinement workflow
+│   ├── engine.py        # PromptRefinementEngine
+│   └── utils.py         # JSON parsing utilities
+├── api/                 # REST API layer
+│   ├── app.py           # FastAPI routes & endpoints
+│   ├── manager.py       # PromptRefinementManager
+│   └── session.py       # Session state management
+└── ui/                  # Streamlit interface
+    ├── app.py           # Main Streamlit app
+    └── client.py        # HTTP client for API
+```
+
 ### Core Components
 
-**Prompt Refinement Engine** (`refinement_engine.py`)
+**Prompt Refinement Engine** (`prompt_refiner/workflow/engine.py`)
 - Orchestrates a multi-agent workflow using the `agno` library
 - Manages iterative refinement through clarification, analysis, synthesis, evaluation, testing, and revision phases
 - Supports configurable max rounds for clarification (default: 3) and loop iterations (default: 5)
 
-**Agent System** (`agents.py`)
+**Agent System** (`prompt_refiner/agents/`)
 - Defines specialized agents for each workflow phase:
   - **Analyzer**: Extracts core components from initial prompts
   - **Questioner**: Generates clarifying questions for user context
@@ -55,20 +77,20 @@ uv run python main2.py
   - **Revisor**: Iteratively improves prompts based on evaluations
 - Uses Pydantic models for structured agent outputs
 
-**API Layer** (`api.py`)
+**API Layer** (`prompt_refiner/api/`)
 - FastAPI application managing refinement sessions
 - Session-based workflow with endpoints for creating sessions, retrieving questions, and submitting answers
 - Uses `InMemorySessionStore` for session persistence
 
-**Refinement Manager** (`refinement_manager.py`)
+**Refinement Manager** (`prompt_refiner/api/manager.py`)
 - Bridges the API and refinement engine
 - Manages session state, clarification flow, and iteration control
 - Handles asynchronous question/answer interaction
 
-**Frontend** (`streamlit_app.py`)
+**Frontend** (`prompt_refiner/ui/`)
 - Streamlit UI for interactive refinement sessions
 - Supports clarification Q&A, iteration control, and result viewing
-- Communicates with backend via `streamlit_client.py`
+- Communicates with backend via HTTP client
 
 ### Key Dependencies
 - **agno**: Workflow orchestration and agent management
@@ -83,7 +105,8 @@ uv run python main2.py
 - Uses `uv` for dependency management via `pyproject.toml`
 
 ### Development Notes
-- Flat repository structure while workflows stabilize
-- All agent configurations isolated in `agents.py`
+- Organized package structure with clear separation of concerns
+- Agent configurations and models separated in `prompt_refiner/agents/`
 - Session management currently in-memory (not persistent across restarts)
 - Structured outputs use Pydantic models with JSON extraction fallbacks
+- Entry points (prompt.py, run_api.py) remain at root for easy access

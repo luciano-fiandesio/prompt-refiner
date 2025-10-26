@@ -6,13 +6,14 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from agents import build_agents
-from refinement_manager import PromptRefinementManager
-from session_store import InMemorySessionStore
+from prompt_refiner.agents.builder import build_agents
+from prompt_refiner.api.manager import PromptRefinementManager
+from prompt_refiner.api.session import InMemorySessionStore
 
 
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(BASEDIR, ".env"))
+# Get project root (two levels up from this file: api/ -> prompt_refiner/ -> project_root/)
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 
 logging.basicConfig(level=logging.INFO)

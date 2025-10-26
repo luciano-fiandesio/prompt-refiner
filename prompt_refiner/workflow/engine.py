@@ -10,8 +10,8 @@ from agno.workflow.step import Step
 from agno.workflow.types import StepOutput
 from agno.workflow.workflow import Workflow
 
-from agents import (
-    AgentBundle,
+from prompt_refiner.agents.builder import AgentBundle
+from prompt_refiner.agents.models import (
     AnalysisSummary,
     ClarificationAssessment,
     ClarificationTranscript,
@@ -159,7 +159,7 @@ class PromptRefinementEngine:
             candidate = cls._largest_json_object(stripped)
             if candidate:
                 text = candidate
-        text = text.replace("“", '"').replace("”", '"').replace("’", "'")
+        text = text.replace(""", '"').replace(""", '"').replace("'", "'")
         text = pyre.sub(r",\s*([}\]])", r"\1", text)
         return text.strip()
 
@@ -406,7 +406,7 @@ class PromptRefinementEngine:
             f"- Target audience: {analysis['audience']}\n"
             f"- Expected output format: {analysis['output_format']}\n\n"
             "Original user need that requires instructions:\n"
-            f"\"\"\"{user_prompt}\"\"\"\n\n"
+            f'"""{user_prompt}"""\n\n'
             "Now create a META-PROMPT (instructions for another AI) to address this need:"
         )
         run = self._run_with_logging(

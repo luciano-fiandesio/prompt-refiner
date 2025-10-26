@@ -1,6 +1,6 @@
 import streamlit as st
 
-from streamlit_client import PromptRefinementClient
+from prompt_refiner.ui.client import PromptRefinementClient
 
 
 st.set_page_config(page_title="Prompt Refinement", layout="wide")

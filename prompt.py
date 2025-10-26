@@ -2,8 +2,8 @@ import os
 import sys
 from dotenv import load_dotenv
 
-from agents import build_agents
-from refinement_engine import PromptRefinementEngine
+from prompt_refiner.agents import build_agents
+from prompt_refiner.workflow import PromptRefinementEngine
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 _ = load_dotenv(os.path.join(BASEDIR, ".env"))
